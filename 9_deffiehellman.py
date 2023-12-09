@@ -1,57 +1,35 @@
 
-
-def prime_checker(p):
-	if p < 1:
-		return -1
-	elif p > 1:
-		if p == 2:
-			return 1
-		for i in range(2, p):
-			if p % i == 0:
-				return -1
-			return 1
-
-
-def primitive_check(g, p, L):
-	for i in range(1, p):
-		L.append(pow(g, i) % p)
-	for i in range(1, p):
-		if L.count(i) > 1:
-			L.clear()
-			return -1
-		return 1
-
-
-l = []
-while 1:
-	P = int(input("Enter P : "))
-	if prime_checker(P) == -1:
-		print("Number Is Not Prime, Please Enter Again!")
-		continue
-	break
-
-while 1:
-	G = int(input(f"Enter The Primitive Root Of {P} : "))
-	if primitive_check(G, P, l) == -1:
-		print(f"Number Is Not A Primitive Root Of {P}, Please Try Again!")
-		continue
-	break
-
-x1, x2 = int(input("Enter The Private Key Of User 1 : ")), int(
-	input("Enter The Private Key Of User 2 : "))
-while 1:
-	if x1 >= P or x2 >= P:
-		print(f"Private Key Of Both The Users Should Be Less Than {P}!")
-		continue
-	break
-
-y1, y2 = pow(G, x1) % P, pow(G, x2) % P
-
-k1, k2 = pow(y2, x1) % P, pow(y1, x2) % P
-
-print(f"\nSecret Key For User 1 Is {k1}\nSecret Key For User 2 Is {k2}\n")
-
-if k1 == k2:
-	print("Keys Have Been Exchanged Successfully")
-else:
-	print("Keys Have Not Been Exchanged Successfully")
+def mod_exp(base, exponent, modulus):
+    result = 1
+    base = base % modulus
+    while exponent > 0:
+        if exponent % 2 == 1:
+            result = (result * base) % modulus
+        exponent = exponent >> 1
+        base = (base * base) % modulus
+    return result
+ 
+# Diffie-Hellman Key Exchange
+def diffie_hellman(prime, base):
+    # Alice's private key
+    a_private = int(input("Alice: Enter private key (a): "))
+    # Bob's private key
+    b_private = int(input("Bob: Enter private key (b): "))
+ 
+    # Calculate public keys
+    a_public = mod_exp(base, a_private, prime)
+    b_public = mod_exp(base, b_private, prime)
+ 
+    # Calculate shared secret
+    alice_shared_secret = mod_exp(b_public, a_private, prime)
+    bob_shared_secret = mod_exp(a_public, b_private, prime)
+ 
+    # Print shared secrets
+    print("\nShared Secret (Alice):", alice_shared_secret)
+    print("Shared Secret (Bob):", bob_shared_secret)
+ 
+# Example usage
+if __name__ == "__main__":
+    prime = int(input("Enter the prime number (p): "))
+    base = int(input("Enter the base/generator (g): "))
+    diffie_hellman(prime, base)
