@@ -1,32 +1,37 @@
 import math
 
-def extended_gcd(a, b):
-    if a == 0:
-        return b, 0, 1
-    else:
-        gcd, x, y = extended_gcd(b % a, a)
-        return gcd, y - (b // a) * x, x
+# Step 1: Take user input for prime numbers p and q
+p = int(input("Enter a prime number (p): "))
+q = int(input("Enter another prime number (q): "))
 
-p = int(input("Enter the value of p: "))
-q = int(input("Enter the value of q: "))
+# Step 2: Calculate n
+
 n = p * q
+print("n =", n)
+
+# Step 3: Calculate phi(n)
 phi = (p - 1) * (q - 1)
-e = 2
+print("phi(n) =", phi)
 
-while e < phi:
-    if math.gcd(e, phi) == 1:
-        break
-    else:
-        e += 1
+# Step 4: Choose e (public key)
+e = int(input(f"Choose a number e such that 1 < e < {phi} and gcd(e, {phi}) = 1: "))
+while math.gcd(e, phi) != 1:
+    e = int(input("Invalid e. Choose another e: "))
 
-gcd, x, y = extended_gcd(e, phi)
-d = x % phi
+# Step 5: Calculate d (private key) using modular multiplicative inverse
+d = pow(e, -1, phi)
+print("d =", d)
+print(f'Public key: ({e}, {n})')
+print(f'Private key: ({d}, {n})')
 
-m = int(input("Enter the value of m: "))
-ct = pow(m, e) % n
-print("Cipher text:", ct)
+# Step 6: Take user input for the plaintext message
+msg = int(input("Enter the message you want to encrypt (as an integer): "))
+print(f'Original message: {msg}')
 
-dt = pow(ct, d) % n
-print("Decrypted text:", dt)
-print("\nPublic Key (e, n):", (e, n))
-print("Private Key (d, n):", (d, n))
+# Step 7: Encryption
+C = pow(msg, e, n)
+print(f'Encrypted message: C ≡ {msg}^{e} (mod {n}) = {C}')
+
+# Step 8: Decryption
+M = pow(C, d, n)
+print(f'Decrypted message: M ≡ {C}^{d} (mod {n}) = {M}')
